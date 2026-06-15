@@ -10,32 +10,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Base de datos temporal en memoria (después conectamos la real)
-let citas = [
-  { id:1, fisio:'dr.carlos', paciente:'Rosa García', telefono:'+528671112233', tipo:'Rehab. hombro', fecha:'2025-06-12', hora:'13:00', wa:true },
-  { id:2, fisio:'dr.carlos', paciente:'María Sánchez', telefono:'+528672223344', tipo:'Terapia cervical', fecha:'2025-06-12', hora:'14:00', wa:true },
-  { id:3, fisio:'dra.laura', paciente:'Ana López', telefono:'+528676667788', tipo:'Rehab. columna', fecha:'2025-06-12', hora:'15:00', wa:true },
-  { id:4, fisio:'miguel', paciente:'Fernando Cruz', telefono:'+528671002200', tipo:'Rehab. tobillo', fecha:'2025-06-12', hora:'13:00', wa:true },
-  { id:5, fisio:'sofia', paciente:'Jorge Reyes', telefono:'+528673004400', tipo:'Rehab. espalda', fecha:'2025-06-12', hora:'14:00', wa:true },
-];
+let citas = [];
 
-let pacientes = [
-  { id:1, fisio:'dr.carlos', nombre:'Rosa García', telefono:'+528671112233', tipo:'Rehab. hombro', citas:8 },
-  { id:2, fisio:'dr.carlos', nombre:'María Sánchez', telefono:'+528672223344', tipo:'Terapia cervical', citas:5 },
-  { id:3, fisio:'dra.laura', nombre:'Ana López', telefono:'+528676667788', tipo:'Rehab. columna', citas:10 },
-  { id:4, fisio:'miguel', nombre:'Fernando Cruz', telefono:'+528671002200', tipo:'Rehab. tobillo', citas:3 },
-  { id:5, fisio:'sofia', nombre:'Jorge Reyes', telefono:'+528673004400', tipo:'Rehab. espalda', citas:6 },
-];
+let pacientes = [];
 
 const usuarios = {
-  'dr.carlos': { password:'carlos123', nombre:'Dr. Carlos Martínez' },
-  'dra.laura': { password:'laura123',  nombre:'Dra. Laura Rodríguez' },
-  'miguel':    { password:'miguel123', nombre:'Miguel González' },
-  'sofia':     { password:'sofia123',  nombre:'Sofía Ortega' },
-  'admin':     { password:'admin123',  nombre:'Administrador' },
+  'aldo':  { password:'aldo123',  nombre:'Aldo' },
+  'viky':  { password:'viky123',  nombre:'Viky' },
+  'sara':  { password:'sara123',  nombre:'Sara' },
+  'admin': { password:'admin123', nombre:'Administrador' },
 };
-
-// ── RUTAS ──
 
 // Login
 app.post('/login', (req, res) => {
@@ -47,7 +31,7 @@ app.post('/login', (req, res) => {
   res.json({ ok: true, nombre: user.nombre, usuario });
 });
 
-// Obtener citas (por fisio o todas si es admin)
+// Obtener citas
 app.get('/citas', (req, res) => {
   const { fisio, fecha } = req.query;
   let resultado = citas;
@@ -60,15 +44,16 @@ app.get('/citas', (req, res) => {
 app.post('/citas', (req, res) => {
   const nueva = { ...req.body, id: Date.now() };
   citas.push(nueva);
-  // Agregar paciente si no existe
   const existe = pacientes.find(p => p.telefono === nueva.telefono);
   if (!existe) {
     pacientes.push({ id: Date.now()+1, fisio: nueva.fisio, nombre: nueva.paciente, telefono: nueva.telefono, tipo: nueva.tipo, citas: 1 });
+  } else {
+    existe.citas++;
   }
   res.json({ ok: true, cita: nueva });
 });
 
-// Mover cita (admin)
+// Mover cita
 app.put('/citas/:id/mover', (req, res) => {
   const { fisioDestino } = req.body;
   const cita = citas.find(c => c.id == req.params.id);
@@ -77,13 +62,13 @@ app.put('/citas/:id/mover', (req, res) => {
   res.json({ ok: true, cita });
 });
 
-// Quitar cita (admin)
+// Quitar cita
 app.delete('/citas/:id', (req, res) => {
   citas = citas.filter(c => c.id != req.params.id);
   res.json({ ok: true });
 });
 
-// Obtener pacientes por fisio
+// Obtener pacientes
 app.get('/pacientes', (req, res) => {
   const { fisio } = req.query;
   let resultado = pacientes;
