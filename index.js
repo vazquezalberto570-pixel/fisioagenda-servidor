@@ -3,7 +3,11 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
 // Base de datos temporal en memoria (después conectamos la real)
