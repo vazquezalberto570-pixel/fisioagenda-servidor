@@ -49,7 +49,7 @@ async function mandarMensaje(telefono, mensaje) {
 function programarRecordatorios() {
   const ahora = new Date();
   const manana8am = new Date();
-  manana8am.setHours(8, 0, 0, 0);
+  manana8am.setHours(7, 0, 0, 0);
   if (ahora >= manana8am) manana8am.setDate(manana8am.getDate() + 1);
   setTimeout(() => {
     mandarRecordatoriosHoy();
@@ -80,4 +80,4 @@ app.get('/pacientes', (req, res) => { const { fisio } = req.query; let r = pacie
 app.get('/', (req, res) => res.json({ mensaje: '✅ Servidor FisioAgenda funcionando' }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`✅ Servidor en puerto ${PORT}`); conectarWhatsApp(); programarRecordatorios(); });
+app.listen(PORT, () => { console.log(`✅ Servidor en puerto ${PORT}`); conectarWhatsApp(); programarRecordatorios(); })
